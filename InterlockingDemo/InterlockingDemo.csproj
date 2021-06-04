@@ -108,8 +108,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Equipment.cs" />
     <Compile Include="Classes\Route.cs" />
     <Compile Include="Classes\ShuntRoute.cs" />
+    <Compile Include="Classes\Signal.cs" />
     <Compile Include="Classes\TrainRoute.cs" />
     <Compile Include="Helpler\EXCELHelper.cs" />
     <Compile Include="Helpler\RootPathHelper.cs" />

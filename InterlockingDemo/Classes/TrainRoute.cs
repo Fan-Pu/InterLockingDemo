@@ -19,6 +19,10 @@ namespace InterlockingDemo.Classes
         /// 类型（接车，发车，通过）
         /// </summary>
         public string TrainRouteType;
+        /// <summary>
+        /// 从哪个股道/信号机来，或者去往哪个股道/信号机
+        /// </summary>
+        public string HeadToOrDepartFrom;
 
         public TrainRoute()
         {

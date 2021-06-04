@@ -20,6 +20,7 @@ namespace InterlockingDemo.ViewModel
 
         #region <commands>
         public RelayCommand SelectInterlockingFileCM { get; set; }
+        public RelayCommand SelectSignalFileCM { get; set; }
         #endregion
 
 
@@ -32,11 +33,17 @@ namespace InterlockingDemo.ViewModel
         public void InitCommands()
         {
             SelectInterlockingFileCM = new RelayCommand(SelectInterlockingFileFunc);
+            SelectSignalFileCM = new RelayCommand(SelectSignalFileFunc);
         }
 
         public void SelectInterlockingFileFunc()
         {
-            EXCELHelper.ReadEXCELFile();
+            EXCELHelper.ReadRouteEXCELFile();
+        }
+
+        public void SelectSignalFileFunc()
+        {
+            EXCELHelper.ReadSignalEXCELFile();
         }
         #endregion
     }
