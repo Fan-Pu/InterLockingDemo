@@ -11,9 +11,13 @@ namespace InterlockingDemo.Classes
     /// </summary>
     class TrainRoute:Route
     {
-        //方向（北京方向，武汉方向）
+        /// <summary>
+        /// 方向（北京方向，武汉方向）
+        /// </summary>
         public string Direction;
-        //类型（接车，发车，通过）
+        /// <summary>
+        /// 类型（接车，发车，通过）
+        /// </summary>
         public string TrainRouteType;
 
         public TrainRoute()

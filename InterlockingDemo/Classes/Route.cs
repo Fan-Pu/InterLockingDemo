@@ -11,23 +11,41 @@ namespace InterlockingDemo.Classes
     /// </summary>
     class Route
     {
-        //始端按钮
+        /// <summary>
+        /// 始端按钮
+        /// </summary>
         public string StartButton;
-        //终端按钮
+        /// <summary>
+        /// 终端按钮
+        /// </summary>
         public string EndButton;
-        //信号机名称
+        /// <summary>
+        /// 信号机名称
+        /// </summary>
         public string SignalName;
-        //信号机显示
+        /// <summary>
+        /// 信号机显示
+        /// </summary>
         public string SignalLight;
-        //道岔
+        /// <summary>
+        /// 道岔
+        /// </summary>
         public List<string> Switches;
-        //敌对信号
+        /// <summary>
+        /// 敌对信号
+        /// </summary>
         public List<string> ConflictSignals;
-        //轨道区段
+        /// <summary>
+        /// 轨道区段
+        /// </summary>
         public List<string> Sections;
-        //迎面进路（列车）
+        /// <summary>
+        /// 迎面进路（列车）
+        /// </summary>
         public string HeadonTrainRoute;
-        //迎面进路（调车）
+        /// <summary>
+        /// 迎面进路（调车）
+        /// </summary>
         public string HeadonShuntRoute;
 
         public Route()

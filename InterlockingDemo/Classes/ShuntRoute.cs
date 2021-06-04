@@ -8,9 +8,13 @@ namespace InterlockingDemo.Classes
 {
     class ShuntRoute:Route
     {
-        //起始调车信号机
+        /// <summary>
+        /// 起始调车信号机
+        /// </summary>
         public string StartShuntSignal;
-        //终点（股道号或信号机）
+        /// <summary>
+        /// 终点（股道号或信号机）
+        /// </summary>
         public string Termination;
 
         public ShuntRoute()
