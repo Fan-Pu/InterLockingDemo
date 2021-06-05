@@ -9,8 +9,19 @@ namespace InterlockingDemo.Classes
     /// <summary>
     /// 进路基类
     /// </summary>
-    class Route
+    public class Route
     {
+        /// <summary>
+        /// 进路名字（始端按钮-终端按钮）
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return StartButton + "-" + EndButton;
+            }
+        }
+
         /// <summary>
         /// 始端按钮
         /// </summary>
@@ -47,12 +58,45 @@ namespace InterlockingDemo.Classes
         /// 迎面进路（调车）
         /// </summary>
         public string HeadonShuntRoute;
+        /// <summary>
+        /// 进路的朝向
+        /// </summary>
+        public string HeadToDirection;
 
         public Route()
         {
             Switches = new List<string>();
             ConflictSignals = new List<string>();
             Sections = new List<string>();
+        }
+
+        public static void GenSectionString(Structure structure, string string_return, string start_point, string end_point, string direction)
+        {
+            //判断起始点类型
+            //信号机
+            if (start_point.Contains("X") || start_point.Contains("S") || start_point.Contains("D"))
+            {
+                Signal signal = structure.Signals[start_point];
+                //查找
+
+            }
+        }
+
+        /// <summary>
+        /// 格式化字符串为设备名字
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string FormateStringIntoEquipmentName(string input)
+        {
+            string output = string.Copy(input);
+            output = output.Replace("LA", "");
+            output = output.Replace("TA", "");
+            output = output.Replace("DA", "");
+            output = output.Replace("A", "");
+            output = output.Replace("信号机-", "");
+            output = output.Replace("道岔-", "");
+            return output;
         }
     }
 }

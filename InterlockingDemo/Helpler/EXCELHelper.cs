@@ -56,9 +56,9 @@ namespace InterlockingDemo.Helpler
             }
         }
 
-        public static List<Route> ReadRouteEXCELFile()
+        public static Dictionary<string, Route> ReadRouteEXCELFile()
         {
-            List<Route> route_list = new List<Route>();
+            Dictionary<string, Route> route_list = new Dictionary<string, Route>();
             FileStream fs = null;
             IWorkbook workbook = GetIWorkbook(fs);
 
@@ -317,17 +317,29 @@ namespace InterlockingDemo.Helpler
                                 }
                             }
                         }
+                        else if (colum_name == "朝向")
+                        {
+                            ICell cell = row.GetCell(colum_idx);
+                            if (train_route != null)
+                            {
+                                train_route.HeadToDirection = cell.StringCellValue;
+                            }
+                            else if (shunt_route != null)
+                            {
+                                shunt_route.HeadToDirection = cell.StringCellValue;
+                            }
+                        }
                     }
                 }
                 if (is_initialized)
                 {
                     if (train_route != null)
                     {
-                        route_list.Add(train_route);
+                        route_list.Add(train_route.Name, train_route);
                     }
                     else if (shunt_route != null)
                     {
-                        route_list.Add(shunt_route);
+                        route_list.Add(shunt_route.Name, shunt_route);
                     }
                 }
             }
@@ -336,9 +348,9 @@ namespace InterlockingDemo.Helpler
             return route_list;
         }
 
-        public static List<Signal> ReadSignalEXCELFile()
+        public static Dictionary<string, Signal> ReadSignalEXCELFile()
         {
-            List<Signal> signal_list = new List<Signal>();
+            Dictionary<string, Signal> signal_list = new Dictionary<string, Signal>();
             FileStream fs = null;
             IWorkbook workbook = GetIWorkbook(fs);
 
@@ -359,6 +371,8 @@ namespace InterlockingDemo.Helpler
                 string signal_name = "";
                 string signal_type = "";
                 string direction = "";
+                Tuple<string, string> conn_tuple_0 = null;
+                Tuple<string, string> conn_tuple_1 = null;
                 foreach (var colum_idx in columns.Keys)
                 {
                     ICell cell = row.GetCell(colum_idx);
@@ -371,17 +385,154 @@ namespace InterlockingDemo.Helpler
                     {
                         signal_type = cell.StringCellValue;
                     }
-                    else if (colum_name == "方向")
+                    else if (colum_name == "朝向")
                     {
                         direction = cell.StringCellValue;
                     }
+                    else if (colum_name == "北京方向连接")
+                    {
+                        if (cell != null)
+                        {
+                            conn_tuple_0 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                    }
+                    else if (colum_name == "武汉方向连接")
+                    {
+                        if (cell != null)
+                        {
+                            conn_tuple_1 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                    }
                 }
-                Signal signal = new Signal(signal_name, signal_type, direction);
-                signal_list.Add(signal);
+                Signal signal = new Signal(signal_name, signal_type, direction, conn_tuple_0, conn_tuple_1);
+                signal_list.Add(signal.Name, signal);
             }
 
             workbook.Close();
             return signal_list;
+        }
+
+        public static Dictionary<string, Switch> ReadSwitchEXCELFile ()
+        {
+            Dictionary<string, Switch> switch_list = new Dictionary<string, Switch>();
+            FileStream fs = null;
+            IWorkbook workbook = GetIWorkbook(fs);
+
+            //获取数据表
+            ISheet sheet = workbook.GetSheetAt(0);
+            //表头
+            IRow header = sheet.GetRow(sheet.FirstRowNum);
+            Dictionary<int, string> columns = new Dictionary<int, string>();
+            for (int i = 0; i < header.LastCellNum; i++)
+            {
+                ICell cell = header.GetCell(i);
+                columns.Add(i, cell.StringCellValue);
+            }
+
+            for (int i = 1; i <= sheet.LastRowNum; i++)
+            {
+                IRow row = sheet.GetRow(i);
+                string switch_name = "";
+                string double_switch = "";
+                string direction = "";
+                Tuple<string, string> conn_tuple_0 = null;
+                Tuple<string, string> conn_tuple_1 = null;
+                foreach (var colum_idx in columns.Keys)
+                {
+                    ICell cell = row.GetCell(colum_idx);
+                    string colum_name = columns[colum_idx];
+                    if (colum_name == "名称")
+                    {
+                        switch_name = cell.StringCellValue;
+                    }
+                    else if (colum_name == "双动道岔")
+                    {
+                        if (cell != null)
+                        {
+                            double_switch = cell.StringCellValue;
+                        }
+                    }
+                    else if (colum_name == "朝向")
+                    {
+                        direction = cell.StringCellValue;
+                    }
+                    else if (colum_name == "定位开向")
+                    {
+                        if (cell != null)
+                        {
+                            conn_tuple_0 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                    }
+                    else if (colum_name == "反位开向")
+                    {
+                        if (cell != null)
+                        {
+                            conn_tuple_1 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                    }
+                }
+                Switch _switch = new Switch(switch_name, double_switch, direction, conn_tuple_0, conn_tuple_1);
+                switch_list.Add(_switch.Name, _switch);
+            }
+
+            workbook.Close();
+            return switch_list;
+        }
+
+        public static Dictionary<string, Section> ReadSectionEXCELFile()
+        {
+            Dictionary<string, Section> section_list = new Dictionary<string, Section>();
+            FileStream fs = null;
+            IWorkbook workbook = GetIWorkbook(fs);
+
+            //获取数据表
+            ISheet sheet = workbook.GetSheetAt(0);
+            //表头
+            IRow header = sheet.GetRow(sheet.FirstRowNum);
+            Dictionary<int, string> columns = new Dictionary<int, string>();
+            for (int i = 0; i < header.LastCellNum; i++)
+            {
+                ICell cell = header.GetCell(i);
+                columns.Add(i, cell.StringCellValue);
+            }
+
+            for (int i = 1; i <= sheet.LastRowNum; i++)
+            {
+                IRow row = sheet.GetRow(i);
+                string section_name = "";
+                string begin_from = "";
+                string end_at = "";
+                string section_type = "";
+                foreach (var colum_idx in columns.Keys)
+                {
+                    ICell cell = row.GetCell(colum_idx);
+                    string colum_name = columns[colum_idx];
+                    if (colum_name == "名称")
+                    {
+                        section_name = cell.StringCellValue;
+                    }
+                    else if (colum_name == "始端")
+                    {
+                        begin_from = cell.StringCellValue;
+                    }
+                    else if (colum_name == "终端")
+                    {
+                        end_at = cell.StringCellValue;
+                    }
+                    else if (colum_name == "类型")
+                    {
+                        if (cell != null)
+                        {
+                            section_type = cell.StringCellValue;
+                        }
+                    }
+                }
+                Section section = new Section(section_name, begin_from, end_at, section_type);
+                section_list.Add(section.Name, section);
+            }
+
+            workbook.Close();
+            return section_list;
         }
 
         /// <summary>

@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace InterlockingDemo.Classes
 {
-    public class Signal:Equipment
+    public class Switch:Equipment
     {
         /// <summary>
-        /// 信号机类型（列车、调车）
+        /// 双动道岔的另一端，如果为单动道岔此字段为空
         /// </summary>
-        public string SignalType;
+        public string DoubleSwitch;
 
         /// <summary>
         /// 朝向的方向
         /// </summary>
         public string Direction;
 
-        public Signal(string name, string signal_type, string direction, Tuple<string, string> conn_tuple_0, 
+        public Switch(string name, string double_switch, string direction, Tuple<string, string> conn_tuple_0,
             Tuple<string, string> conn_tuple_1)
         {
             Name = name;
-            SignalType = signal_type;
+            DoubleSwitch = double_switch;
             Direction = direction;
             ConnEquipNames[0] = conn_tuple_0;
             ConnEquipNames[1] = conn_tuple_1;
