@@ -144,7 +144,7 @@ namespace InterlockingDemo.Helpler
                         {
                             if (train_route != null)
                             {
-                                train_route.Direction = GetCellStringValue(sheet, i, colum_idx, last_resort_map);
+                                train_route.HeadFromDirection = GetCellStringValue(sheet, i, colum_idx, last_resort_map);
                             }
                         }
                         else if (colum_name == "方向-2")
@@ -329,6 +329,18 @@ namespace InterlockingDemo.Helpler
                                 shunt_route.HeadToDirection = cell.StringCellValue;
                             }
                         }
+                        else if (colum_name == "进路号码")
+                        {
+                            ICell cell = row.GetCell(colum_idx);
+                            if (train_route != null)
+                            {
+                                train_route.ID = (int)cell.NumericCellValue;
+                            }
+                            else if (shunt_route != null)
+                            {
+                                shunt_route.ID = (int)cell.NumericCellValue;
+                            }
+                        }
                     }
                 }
                 if (is_initialized)
@@ -435,8 +447,9 @@ namespace InterlockingDemo.Helpler
                 string switch_name = "";
                 string double_switch = "";
                 string direction = "";
-                Tuple<string, string> conn_tuple_0 = null;
-                Tuple<string, string> conn_tuple_1 = null;
+                Tuple<string, string> yingmian_dingwei = null;
+                Tuple<string, string> yingmian_fanwei = null;
+                Tuple<string, string> duixiang_dingwei = null;
                 foreach (var colum_idx in columns.Keys)
                 {
                     ICell cell = row.GetCell(colum_idx);
@@ -456,22 +469,29 @@ namespace InterlockingDemo.Helpler
                     {
                         direction = cell.StringCellValue;
                     }
-                    else if (colum_name == "定位开向")
+                    else if (colum_name == "迎面定位开向")
                     {
                         if (cell != null)
                         {
-                            conn_tuple_0 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                            yingmian_dingwei = new Tuple<string, string>(colum_name, cell.StringCellValue);
                         }
                     }
-                    else if (colum_name == "反位开向")
+                    else if (colum_name == "迎面反位开向")
                     {
                         if (cell != null)
                         {
-                            conn_tuple_1 = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                            yingmian_fanwei = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                    }
+                    else if(colum_name == "对向定位开向")
+                    {
+                        if (cell != null)
+                        {
+                            duixiang_dingwei = new Tuple<string, string>(colum_name, cell.StringCellValue);
                         }
                     }
                 }
-                Switch _switch = new Switch(switch_name, double_switch, direction, conn_tuple_0, conn_tuple_1);
+                Switch _switch = new Switch(switch_name, double_switch, direction, yingmian_dingwei, yingmian_fanwei, duixiang_dingwei);
                 switch_list.Add(_switch.Name, _switch);
             }
 

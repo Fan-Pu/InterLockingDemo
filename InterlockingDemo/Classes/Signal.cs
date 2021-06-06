@@ -24,8 +24,8 @@ namespace InterlockingDemo.Classes
             Name = name;
             SignalType = signal_type;
             Direction = direction;
-            ConnEquipNames[0] = conn_tuple_0;
-            ConnEquipNames[1] = conn_tuple_1;
+            ConnEquipNames.Add(conn_tuple_0);
+            ConnEquipNames.Add(conn_tuple_1);
         }
     }
 }

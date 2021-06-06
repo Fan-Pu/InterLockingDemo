@@ -10,11 +10,11 @@ namespace InterlockingDemo.Classes
     {
         public string Name { get; set; }
 
-        public Tuple<string,string>[] ConnEquipNames { get; set; } 
+        public List<Tuple<string, string>> ConnEquipNames { get; set; } 
 
         public Equipment()
         {
-            ConnEquipNames = new Tuple<string, string>[2];
+            ConnEquipNames = new List<Tuple<string, string>>();
         }
     }
 }

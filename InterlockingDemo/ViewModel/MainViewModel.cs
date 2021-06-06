@@ -2,6 +2,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using InterlockingDemo.Classes;
 using InterlockingDemo.Helpler;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace InterlockingDemo.ViewModel
@@ -65,9 +66,10 @@ namespace InterlockingDemo.ViewModel
         }
 
         public void CheckInterlockingFeasibilityFunc()
-        {
+        {            
             if (CheckDataIntegrility())
             {
+                int no = 0;
                 foreach(string route_key in structure.Routes.Keys)
                 {
                     Route route = structure.Routes[route_key];
@@ -76,6 +78,7 @@ namespace InterlockingDemo.ViewModel
                     if (t == typeof(TrainRoute))
                     {
                         TrainRoute train_route = route as TrainRoute;
+                        string direction = train_route.HeadToDirection;
                         string start_point = Route.FormateStringIntoEquipmentName(train_route.StartButton);
 
                         string end_point = train_route.EndButton;
@@ -91,7 +94,10 @@ namespace InterlockingDemo.ViewModel
                         {
                             end_point = Route.FormateStringIntoEquipmentName(end_point);
                         }
-                        //string switch_string=
+                        List<List<string>> greedy_path = new List<List<string>>();
+                        int index = 0;
+                        Route.GenEquipmentString(structure, greedy_path, index, start_point, end_point, direction);
+                        string switch_string = Route.GenSwitchString(structure, greedy_path);
                     }
                     else if (t == typeof(ShuntRoute))
                     {
