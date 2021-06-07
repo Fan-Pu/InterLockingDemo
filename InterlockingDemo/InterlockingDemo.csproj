@@ -111,14 +111,20 @@
     <Compile Include="Classes\Equipment.cs" />
     <Compile Include="Classes\Route.cs" />
     <Compile Include="Classes\Section.cs" />
+    <Compile Include="Classes\SectionErrorItem.cs" />
     <Compile Include="Classes\ShuntRoute.cs" />
     <Compile Include="Classes\Signal.cs" />
     <Compile Include="Classes\Structure.cs" />
     <Compile Include="Classes\Switch.cs" />
+    <Compile Include="Classes\SwitchErrorItem.cs" />
     <Compile Include="Classes\TrainRoute.cs" />
     <Compile Include="Helpler\EXCELHelper.cs" />
     <Compile Include="Helpler\RootPathHelper.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\ShowErrorViewModel.cs" />
+    <Compile Include="Views\ShowErrorView.xaml.cs">
+      <DependentUpon>ShowErrorView.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -131,6 +137,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ShowErrorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -150,7 +160,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Datas\InterlockingTable.xlsx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -159,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Datas\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

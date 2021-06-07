@@ -2,6 +2,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using InterlockingDemo.Classes;
 using InterlockingDemo.Helpler;
+using InterlockingDemo.Views;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -25,6 +27,16 @@ namespace InterlockingDemo.ViewModel
             get { return copyright_univer; }
             set { copyright_univer = value; RaisePropertyChanged(); }
         }
+
+        /// <summary>
+        /// 存储道岔有错误的进路
+        /// </summary>
+        public List<Tuple<string, string>> Switch_with_errors;
+
+        /// <summary>
+        /// 存储区段有错误的进路
+        /// </summary>
+        public List<Tuple<string, string>> Section_with_errors;
         #endregion
 
 
@@ -50,6 +62,8 @@ namespace InterlockingDemo.ViewModel
             structure = new Structure();
             Copyright_name = "—— by Pu Fan";
             Copyright_univer = "Beijing Jiaotong University";
+            Section_with_errors = new List<Tuple<string, string>>();
+            Switch_with_errors = new List<Tuple<string, string>>();
         }
 
         public void InitCommands()
@@ -63,24 +77,55 @@ namespace InterlockingDemo.ViewModel
 
         public void SelectInterlockingFileFunc()
         {
-            structure.Routes = EXCELHelper.ReadRouteEXCELFile();
+            try
+            {
+                structure.Routes = EXCELHelper.ReadRouteEXCELFile();
+            }
+            catch
+            {
+                MessageBox.Show("打开失败，请检查数据！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public void SelectSignalFileFunc()
         {
-            structure.Signals = EXCELHelper.ReadSignalEXCELFile();
+            try
+            {
+                structure.Signals = EXCELHelper.ReadSignalEXCELFile();
+            }
+            catch
+            {
+                MessageBox.Show("打开失败，请检查数据！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public void SelectSwitchFileFunc()
         {
-            structure.Switches = EXCELHelper.ReadSwitchEXCELFile();
+            try
+            {
+                structure.Switches = EXCELHelper.ReadSwitchEXCELFile();
+            }
+            catch
+            {
+                MessageBox.Show("打开失败，请检查数据！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public void SelectSectionFileFunc()
         {
-            structure.Sections = EXCELHelper.ReadSectionEXCELFile();
+            try
+            {
+                structure.Sections = EXCELHelper.ReadSectionEXCELFile();
+            }
+            catch
+            {
+                MessageBox.Show("打开失败，请检查数据！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }            
         }
 
+        /// <summary>
+        /// 检查联锁表错误
+        /// </summary>
         public void CheckInterlockingFeasibilityFunc()
         {            
             if (CheckDataIntegrility())
@@ -122,6 +167,18 @@ namespace InterlockingDemo.ViewModel
                         Route.GenEquipmentString(structure, greedy_path, index, start_point, end_point, direction);
                         string switch_string = Route.GenSwitchString(structure, greedy_path);
                         train_route.GeneratedSwitchString = switch_string;
+                        //与联锁表不匹配
+                        if (switch_string != train_route.SwitchString)
+                        {
+                            Switch_with_errors.Add(new Tuple<string, string>(train_route.Name, switch_string));
+                        }
+                        string section_string = Route.GenSectionString(structure, greedy_path);
+                        train_route.GeneratedSectionString = section_string;
+                        //与联锁表不匹配
+                        if (section_string != train_route.SectionString)
+                        {
+                            Section_with_errors.Add(new Tuple<string, string>(train_route.Name, section_string));
+                        }
                     }
                     else if (t == typeof(ShuntRoute))
                     {
@@ -146,8 +203,23 @@ namespace InterlockingDemo.ViewModel
                         Route.GenEquipmentString(structure, greedy_path, index, start_point, end_point, direction);
                         string switch_string = Route.GenSwitchString(structure, greedy_path);
                         shunt_route.GeneratedSwitchString = switch_string;
+                        //与联锁表不匹配
+                        if (switch_string != shunt_route.SwitchString)
+                        {
+                            Switch_with_errors.Add(new Tuple<string, string>(shunt_route.Name, switch_string));
+                        }
+                        string section_string = Route.GenSectionString(structure, greedy_path);
+                        shunt_route.GeneratedSectionString = section_string;
+                        //与联锁表不匹配
+                        if (section_string != shunt_route.SectionString)
+                        {
+                            Section_with_errors.Add(new Tuple<string, string>(shunt_route.Name, section_string));
+                        }
                     }
                 }
+
+                ShowErrorView view = new ShowErrorView(structure, Switch_with_errors, Section_with_errors);
+                view.ShowDialog();
             }
             else
             {
@@ -156,6 +228,10 @@ namespace InterlockingDemo.ViewModel
             }
         }
 
+        /// <summary>
+        /// 检查数据完整性
+        /// </summary>
+        /// <returns></returns>
         private bool CheckDataIntegrility()
         {
             bool flag = true;

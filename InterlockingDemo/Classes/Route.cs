@@ -44,6 +44,14 @@ namespace InterlockingDemo.Classes
         /// </summary>
         public string SignalLight;
         /// <summary>
+        /// 联锁表中的道岔检查条件
+        /// </summary>
+        public string SwitchString;
+        /// <summary>
+        /// 联锁表中的区段条件
+        /// </summary>
+        public string SectionString;
+        /// <summary>
         /// 道岔
         /// </summary>
         public List<string> Switches;
@@ -75,6 +83,10 @@ namespace InterlockingDemo.Classes
         /// 由软件自动生成的道岔检查条件
         /// </summary>
         public string GeneratedSwitchString;
+        /// <summary>
+        /// 由软件自动生成的区段条件
+        /// </summary>
+        public string GeneratedSectionString;
 
         public Route()
         {
@@ -327,6 +339,235 @@ namespace InterlockingDemo.Classes
         }
 
         /// <summary>
+        /// 根据EquipmentString获取其中经过的区段
+        /// </summary>
+        /// <param name="structure"></param>
+        /// <param name="string_list_return_tree"></param>
+        /// <returns></returns>
+        public static string GenSectionString(Structure structure, List<List<string>> string_list_return_tree)
+        {
+            List<string> section_names = new List<string>();
+            string str_return = "";
+            List<string> equip_string_list = null;
+            foreach (var string_list in string_list_return_tree)
+            {
+                if (string_list.Count != 0)
+                {
+                    equip_string_list = new List<string>(string_list);
+                    break;
+                }
+            }
+            for (int i = 0; i < equip_string_list.Count;) 
+            {
+                //当前设备名称
+                string curr_equip_name = equip_string_list[i];
+                //已包含的设备名称
+                List<string> included_equip_names = new List<string>();
+                //找出以该设备为端头的区段
+                var sections = structure.Sections.Values.Where(section => {
+                    bool flag = false;
+                    List<string> begin_equip = new List<string>();
+                    List<string> end_equip = new List<string>();
+                    //如果始端为绝缘节，则添加描述该绝缘节的两个设备名
+                    if (section.BeginFrom.Contains("绝缘节"))
+                    {
+                        string temp_string = section.BeginFrom.Replace("绝缘节", "");
+                        var strs = temp_string.Split('+');
+                        foreach (string str in strs)
+                        {
+                            begin_equip.Add(str);
+                        }
+                    }
+                    else
+                    {
+                        begin_equip.Add(Route.FormateStringIntoEquipmentName(section.BeginFrom));
+                    }
+
+                    //如果终端为绝缘节，则添加描述该绝缘节的两个设备名
+                    if (section.EndAt.Contains("绝缘节"))
+                    {
+                        string temp_string = section.EndAt.Replace("绝缘节", "");
+                        var strs = temp_string.Split('+');
+                        foreach (string str in strs)
+                        {
+                            begin_equip.Add(str);
+                        }
+                    }
+                    else
+                    {
+                        begin_equip.Add(Route.FormateStringIntoEquipmentName(section.EndAt));
+                    }
+
+                    foreach (var begin_equip_name in begin_equip)
+                    {
+                        if (begin_equip_name == curr_equip_name)
+                        {
+                            flag = true;
+                            return flag;
+                        }
+                    }
+                    foreach (var end_equip_name in end_equip)
+                    {
+                        if (end_equip_name == curr_equip_name)
+                        {
+                            flag = true;
+                            return flag;
+                        }
+                    }
+                    return flag;
+                }).ToList();
+                //找出secions中包含curr_equip_name后续设备名称的section
+                bool finded = false;
+                for (int index = 0; index < sections.Count && !finded; index++)
+                {
+                    Section section = sections[index];
+                    List<string> section_contains = new List<string>();
+                    if (section.Name.Contains("-"))
+                    {
+                        string first_term = section.Name.Split('-').ToList()[0];
+                        section_contains = section_names.Where(m => Route.GetFormmatedSectionName(m) ==
+                        Route.GetFormmatedSectionName(first_term)).ToList();
+                    }
+                    //对于添加了某DG-定位，就不添加某DG-反位
+                    if (section_contains.Count > 0)
+                    {
+                        continue;
+                    }
+                    List<string> begin_equip = new List<string>();
+                    List<string> end_equip = new List<string>();
+                    //如果始端为绝缘节，则添加描述该绝缘节的两个设备名
+                    if (section.BeginFrom.Contains("绝缘节"))
+                    {
+                        string temp_string = section.BeginFrom.Replace("绝缘节", "");
+                        var strs = temp_string.Split('+');
+                        foreach (string str in strs)
+                        {
+                            begin_equip.Add(str);
+                        }
+                    }
+                    else
+                    {
+                        begin_equip.Add(Route.FormateStringIntoEquipmentName(section.BeginFrom));
+                    }
+
+                    //如果终端为绝缘节，则添加描述该绝缘节的两个设备名
+                    if (section.EndAt.Contains("绝缘节"))
+                    {
+                        string temp_string = section.EndAt.Replace("绝缘节", "");
+                        var strs = temp_string.Split('+');
+                        foreach (string str in strs)
+                        {
+                            end_equip.Add(str);
+                        }
+                    }
+                    else
+                    {
+                        end_equip.Add(Route.FormateStringIntoEquipmentName(section.EndAt));
+                    }
+    
+                    //检查begin_equip
+                    for (int j = i + 1; j < equip_string_list.Count && !finded; j++)
+                    {
+                        string following_equip_name = equip_string_list[j];
+                        foreach (var begin_equip_name in begin_equip)
+                        {
+                            if (begin_equip_name == following_equip_name)
+                            {
+                                string added_sec_name = Route.GetFormmatedSectionName(section.Name);
+                                section_names.Add(added_sec_name);
+                                finded = true;
+                                //更新下一次查找的起点
+                                if (!IsEquipSignal(curr_equip_name) && !IsEquipSignal(equip_string_list[j]))
+                                {
+                                    Switch _switch_1 = structure.Switches[curr_equip_name];
+                                    //如果是双动道岔则不跳过
+                                    if(_switch_1.DoubleSwitch== equip_string_list[j])
+                                    {
+                                        i = j;
+                                    }
+                                    else
+                                    {
+                                        i = j + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    i = j;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    //检查end_equip
+                    for (int j = i + 1; j < equip_string_list.Count && !finded; j++)
+                    {
+                        string following_equip_name = equip_string_list[j];
+                        foreach (var end_equip_name in end_equip)
+                        {
+                            if (end_equip_name == following_equip_name)
+                            {
+                                string added_sec_name = Route.GetFormmatedSectionName(section.Name);
+                                section_names.Add(added_sec_name);
+                                finded = true;
+                                //更新下一次查找的起点
+                                if (!IsEquipSignal(curr_equip_name) && !IsEquipSignal(equip_string_list[j]))
+                                {
+                                    Switch _switch_1 = structure.Switches[curr_equip_name];
+                                    //如果是双动道岔则不跳过
+                                    if (_switch_1.DoubleSwitch == equip_string_list[j])
+                                    {
+                                        i = j;
+                                    }
+                                    else
+                                    {
+                                        i = j + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    i = j;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!finded)
+                {
+                    i++;
+                }
+            }
+
+            //找到以最后一个设备(信号机)为始端的区段
+            string last_equip_name = equip_string_list[equip_string_list.Count - 1];
+            var last_secs = structure.Sections.Values.Where(m =>
+            {
+                bool last_flag = false;
+                string begin_equip_name = Route.FormateStringIntoEquipmentName(m.BeginFrom);
+                string end_equip_name = Route.FormateStringIntoEquipmentName(m.EndAt);
+                string splited_section_name = Route.GetFormmatedSectionName(m.Name);
+                if ((begin_equip_name == last_equip_name || end_equip_name == last_equip_name) &&
+                !section_names.Contains(splited_section_name))
+                {
+                    last_flag = true;
+                }
+                return last_flag;
+            }).ToList();
+            if (last_secs.Count != 0)
+            {
+                Section last_sec = last_secs[0];
+                section_names.Add(Route.GetFormmatedSectionName(last_sec.Name));
+            }
+
+            foreach(string str in section_names)
+            {
+                str_return += str + "、";
+            }
+            return str_return.Substring(0, str_return.Length - 1);
+        }
+
+        /// <summary>
         /// 格式化字符串为设备名字
         /// </summary>
         /// <param name="input"></param>
@@ -342,6 +583,33 @@ namespace InterlockingDemo.Classes
             output = output.Replace("信号机", "");
             output = output.Replace("道岔", "");
             return output;
+        }
+
+        /// <summary>
+        /// 判断是否为信号机
+        /// </summary>
+        /// <param name="equip_name"></param>
+        /// <returns></returns>
+        public static bool IsEquipSignal(string equip_name)
+        {
+            bool is_signal = false;
+            if (equip_name.Contains("S") || equip_name.Contains("X") || equip_name.Contains("D"))
+            {
+                is_signal = true;
+            }
+            return is_signal;
+        }
+
+        /// <summary>
+        /// 不包含字符“定位”、“反位”的区段名字
+        /// </summary>
+        /// <param name="section_name"></param>
+        /// <returns></returns>
+        public static string GetFormmatedSectionName(string section_name)
+        {
+            string splited_section_name = section_name.Replace("-定位", "");
+            splited_section_name = splited_section_name.Replace("-反位", "");
+            return splited_section_name;
         }
     }
 }

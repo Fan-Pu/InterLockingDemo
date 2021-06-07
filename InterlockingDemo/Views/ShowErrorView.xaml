@@ -1,0 +1,59 @@
+﻿<Window
+    x:Class="InterlockingDemo.Views.ShowErrorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:InterlockingDemo.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="联锁表错误项"
+    Width="500"
+    Height="300"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Grid>
+        <TabControl Margin="5">
+            <TabItem Header="道岔检查条件">
+                <DataGrid
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding SwitchErrorList}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="0.2*"
+                            Binding="{Binding ID}"
+                            Header="进路号" />
+                        <DataGridTextColumn
+                            Width="0.4*"
+                            Binding="{Binding PrimalSwitchString}"
+                            Header="联锁表数据" />
+                        <DataGridTextColumn
+                            Width="0.4*"
+                            Binding="{Binding GeneratedSwitchString}"
+                            Header="正确数据" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="区间检查条件">
+                <DataGrid
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding SectionErrorList}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="0.2*"
+                            Binding="{Binding ID}"
+                            Header="进路号" />
+                        <DataGridTextColumn
+                            Width="0.4*"
+                            Binding="{Binding PrimalSectionString}"
+                            Header="联锁表数据" />
+                        <DataGridTextColumn
+                            Width="0.4*"
+                            Binding="{Binding GeneratedSectionString}"
+                            Header="正确数据" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

@@ -224,10 +224,11 @@ namespace InterlockingDemo.Helpler
                         }
                         else if (colum_name == "道岔")
                         {
-                            string str = GetCellStringValue(sheet, i, colum_idx, last_resort_map);
-                            var str_array = str.Split('、').ToArray();
+                            string switch_string = GetCellStringValue(sheet, i, colum_idx, last_resort_map);                           
+                            var str_array = switch_string.Split('、').ToArray();
                             if (train_route != null)
                             {
+                                train_route.SwitchString = switch_string;
                                 foreach (string s in str_array)
                                 {
                                     train_route.Switches.Add(s);
@@ -235,6 +236,7 @@ namespace InterlockingDemo.Helpler
                             }
                             else if (shunt_route != null)
                             {
+                                shunt_route.SwitchString = switch_string;
                                 foreach (string s in str_array)
                                 {
                                     shunt_route.Switches.Add(s);
@@ -262,10 +264,11 @@ namespace InterlockingDemo.Helpler
                         }
                         else if (colum_name == "轨道区段")
                         {
-                            string str = GetCellStringValue(sheet, i, colum_idx, last_resort_map);
-                            var str_array = str.Split('、').ToArray();
+                            string section_string = GetCellStringValue(sheet, i, colum_idx, last_resort_map);                          
+                            var str_array = section_string.Split('、').ToArray();
                             if (train_route != null)
                             {
+                                train_route.SectionString = section_string;
                                 foreach (string s in str_array)
                                 {
                                     train_route.Sections.Add(s);
@@ -273,6 +276,7 @@ namespace InterlockingDemo.Helpler
                             }
                             else if (shunt_route != null)
                             {
+                                shunt_route.SectionString = section_string;
                                 foreach (string s in str_array)
                                 {
                                     shunt_route.Sections.Add(s);
@@ -540,6 +544,8 @@ namespace InterlockingDemo.Helpler
                 string begin_from = "";
                 string end_at = "";
                 string section_type = "";
+                Tuple<string, string> conn_beijing = null;
+                Tuple<string, string> conn_wuhan = null;
                 foreach (var colum_idx in columns.Keys)
                 {
                     ICell cell = row.GetCell(colum_idx);
@@ -563,8 +569,30 @@ namespace InterlockingDemo.Helpler
                             section_type = cell.StringCellValue;
                         }
                     }
+                    else if (colum_name == "与北京方向连接")
+                    {
+                        if (cell != null)
+                        {
+                            conn_beijing = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                        else
+                        {
+                            conn_beijing = new Tuple<string, string>(colum_name, null);
+                        }
+                    }
+                    else if (colum_name == "与武汉方向连接")
+                    {
+                        if (cell != null)
+                        {
+                            conn_wuhan = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                        else
+                        {
+                            conn_wuhan = new Tuple<string, string>(colum_name, null);
+                        }
+                    }
                 }
-                Section section = new Section(section_name, begin_from, end_at, section_type);
+                Section section = new Section(section_name, begin_from, end_at, section_type, conn_beijing, conn_wuhan);
                 section_list.Add(section.Name, section);
             }
 
