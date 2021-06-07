@@ -8,6 +8,7 @@
     Title="联锁表检查软件"
     Width="350"
     Height="280"
+    ResizeMode="CanMinimize"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid>
