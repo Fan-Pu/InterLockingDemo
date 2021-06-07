@@ -11,6 +11,20 @@ namespace InterlockingDemo.ViewModel
     {
         #region <properties>
         public Structure structure;
+
+        private string copyright_name;
+        public string Copyright_name
+        {
+            get { return copyright_name; }
+            set { copyright_name = value;RaisePropertyChanged(); }
+        }
+
+        private string copyright_univer;
+        public string Copyright_univer
+        {
+            get { return copyright_univer; }
+            set { copyright_univer = value; RaisePropertyChanged(); }
+        }
         #endregion
 
 
@@ -34,6 +48,8 @@ namespace InterlockingDemo.ViewModel
         public void InitProperties()
         {
             structure = new Structure();
+            Copyright_name = "¡ª¡ª by Pu Fan";
+            Copyright_univer = "Beijing Jiaotong University";
         }
 
         public void InitCommands()
@@ -69,7 +85,6 @@ namespace InterlockingDemo.ViewModel
         {            
             if (CheckDataIntegrility())
             {
-                int no = 0;
                 foreach(string route_key in structure.Routes.Keys)
                 {
                     Route route = structure.Routes[route_key];
@@ -90,6 +105,14 @@ namespace InterlockingDemo.ViewModel
                         {
                             end_point = "D2";
                         }
+                        else if(end_point== "S¢ñLA")
+                        {
+                            end_point = "D5";
+                        }
+                        else if(end_point== "X¢òLA")
+                        {
+                            end_point = "D10";
+                        }
                         else
                         {
                             end_point = Route.FormateStringIntoEquipmentName(end_point);
@@ -98,10 +121,31 @@ namespace InterlockingDemo.ViewModel
                         int index = 0;
                         Route.GenEquipmentString(structure, greedy_path, index, start_point, end_point, direction);
                         string switch_string = Route.GenSwitchString(structure, greedy_path);
+                        train_route.GeneratedSwitchString = switch_string;
                     }
                     else if (t == typeof(ShuntRoute))
                     {
                         ShuntRoute shunt_route = route as ShuntRoute;
+                        string direction = shunt_route.HeadToDirection;
+                        string start_point = Route.FormateStringIntoEquipmentName(shunt_route.StartButton);
+                        string end_point = shunt_route.EndButton;
+                        if (end_point == "S¢ñDA")
+                        {
+                            end_point = "D5";
+                        }
+                        else if (end_point == "X¢òDA")
+                        {
+                            end_point = "D10";
+                        }
+                        else
+                        {
+                            end_point = Route.FormateStringIntoEquipmentName(end_point);
+                        }
+                        List<List<string>> greedy_path = new List<List<string>>();
+                        int index = 0;
+                        Route.GenEquipmentString(structure, greedy_path, index, start_point, end_point, direction);
+                        string switch_string = Route.GenSwitchString(structure, greedy_path);
+                        shunt_route.GeneratedSwitchString = switch_string;
                     }
                 }
             }

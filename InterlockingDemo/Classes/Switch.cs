@@ -19,7 +19,7 @@ namespace InterlockingDemo.Classes
         public string Direction;
 
         public Switch(string name, string double_switch, string direction, Tuple<string, string> yingmian_dingwei,
-            Tuple<string, string> yingmian_fanwei, Tuple<string, string> duixiang_dingwei)
+            Tuple<string, string> yingmian_fanwei, Tuple<string, string> duixiang_dingwei, Tuple<string, string> duixiang_fanwei)
         {
             Name = name;
             DoubleSwitch = double_switch;
@@ -27,6 +27,7 @@ namespace InterlockingDemo.Classes
             ConnEquipNames.Add(yingmian_dingwei);
             ConnEquipNames.Add(yingmian_fanwei);
             ConnEquipNames.Add(duixiang_dingwei);
+            ConnEquipNames.Add(duixiang_fanwei);
         }
     }
 }

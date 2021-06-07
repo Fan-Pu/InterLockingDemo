@@ -71,6 +71,10 @@ namespace InterlockingDemo.Classes
         /// 进路的由哪个方向来
         /// </summary>
         public string HeadFromDirection;
+        /// <summary>
+        /// 由软件自动生成的道岔检查条件
+        /// </summary>
+        public string GeneratedSwitchString;
 
         public Route()
         {
@@ -147,9 +151,19 @@ namespace InterlockingDemo.Classes
                 }
                 else
                 {
-                    //背对道岔，只试探道岔定位
-                    string next_point_dingwei = _switch.ConnEquipNames.Where(m => m.Item1.Contains("对向定位开向")).ToList()[0].Item2;
-                    GenEquipmentString(structure, string_list_return_tree, index, next_point_dingwei, end_point, direction);
+                    //背对道岔，根据背向开通的位置探查
+                    var duixiang_dingwei = _switch.ConnEquipNames.Where(m => m.Item1.Contains("对向定位开向")).ToList()[0].Item2;
+                    var duixiang_fanwei = _switch.ConnEquipNames.Where(m => m.Item1.Contains("对向反位开向")).ToList()[0].Item2;
+                    if (duixiang_dingwei != null)
+                    {
+                        string next_point_dingwei = duixiang_dingwei;
+                        GenEquipmentString(structure, string_list_return_tree, index, next_point_dingwei, end_point, direction);
+                    }
+                    else if (duixiang_fanwei != null)
+                    {
+                        string next_point_fanwei = duixiang_fanwei;
+                        GenEquipmentString(structure, string_list_return_tree, index, next_point_fanwei, end_point, direction);
+                    }
                 }
             }
         }
@@ -219,18 +233,44 @@ namespace InterlockingDemo.Classes
                     else
                     {
                         string str = "";
-                        //该道岔反位方向的下一个设备名称
-                        string fanwei_name = _switch.ConnEquipNames.Where(m => m.Item1 == "迎面反位开向").ToList()[0].Item2;
-                        //走的是反位
-                        if (Route.FormateStringIntoEquipmentName(fanwei_name) == equip_string_list[i + 1])
+                        //该道岔迎面反位方向的下一个设备名称
+                        string yingmian_fanwei_name = _switch.ConnEquipNames.Where(m => m.Item1 == "迎面反位开向").ToList()[0].Item2;
+                        //走的是迎面反位
+                        if (Route.FormateStringIntoEquipmentName(yingmian_fanwei_name) == equip_string_list[i + 1])
                         {
                             str = string.Format("({0})、", _switch.Name);
                         }
-                        //走的是定位
-                        else
+
+                        //该道岔迎面定位方向的下一个设备名称
+                        string yingmian_dingwei_name = _switch.ConnEquipNames.Where(m => m.Item1 == "迎面定位开向").ToList()[0].Item2;
+                        //走的是迎面定位
+                        if(Route.FormateStringIntoEquipmentName(yingmian_dingwei_name) == equip_string_list[i + 1])
                         {
                             str = string.Format("{0}、", _switch.Name);
                         }
+
+                        //该道岔对向定位方向的下一个设备名称
+                        var duixiang_dingwei = _switch.ConnEquipNames.Where(m => m.Item1 == "对向定位开向").ToList()[0].Item2;
+                        if (duixiang_dingwei != null)
+                        {
+                            //走的是对向定位
+                            if (Route.FormateStringIntoEquipmentName(duixiang_dingwei) == equip_string_list[i + 1])
+                            {
+                                str = string.Format("{0}、", _switch.Name);
+                            }
+                        }
+
+                        //该道岔对向反位方向的下一个设备名称
+                        var duixiang_fanwei = _switch.ConnEquipNames.Where(m => m.Item1 == "对向反位开向").ToList()[0].Item2;
+                        if (duixiang_fanwei != null)
+                        {
+                            //走的是对向反位
+                            if (Route.FormateStringIntoEquipmentName(duixiang_fanwei) == equip_string_list[i + 1])
+                            {
+                                str = string.Format("({0})、", _switch.Name);
+                            }
+                        }
+
                         str_return += str;
                         //跳过该双动道岔的另一端
                         i++;

@@ -450,6 +450,7 @@ namespace InterlockingDemo.Helpler
                 Tuple<string, string> yingmian_dingwei = null;
                 Tuple<string, string> yingmian_fanwei = null;
                 Tuple<string, string> duixiang_dingwei = null;
+                Tuple<string, string> duixiang_fanwei = null;
                 foreach (var colum_idx in columns.Keys)
                 {
                     ICell cell = row.GetCell(colum_idx);
@@ -489,9 +490,25 @@ namespace InterlockingDemo.Helpler
                         {
                             duixiang_dingwei = new Tuple<string, string>(colum_name, cell.StringCellValue);
                         }
+                        else
+                        {
+                            duixiang_dingwei = new Tuple<string, string>(colum_name, null);
+                        }
+                    }
+                    else if (colum_name == "对向反位开向")
+                    {
+                        if (cell != null)
+                        {
+                            duixiang_fanwei = new Tuple<string, string>(colum_name, cell.StringCellValue);
+                        }
+                        else
+                        {
+                            duixiang_fanwei = new Tuple<string, string>(colum_name, null);
+                        }
                     }
                 }
-                Switch _switch = new Switch(switch_name, double_switch, direction, yingmian_dingwei, yingmian_fanwei, duixiang_dingwei);
+                Switch _switch = new Switch(switch_name, double_switch, direction, yingmian_dingwei, yingmian_fanwei,
+                    duixiang_dingwei, duixiang_fanwei);
                 switch_list.Add(_switch.Name, _switch);
             }
 
