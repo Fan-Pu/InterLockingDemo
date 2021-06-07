@@ -33,7 +33,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            <TabItem Header="区间检查条件">
+            <TabItem Header="区段检查条件">
                 <DataGrid
                     AutoGenerateColumns="False"
                     IsReadOnly="True"
